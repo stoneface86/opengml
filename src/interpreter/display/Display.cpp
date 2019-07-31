@@ -1219,6 +1219,53 @@ void Display::set_matrix_model(coord_t x, coord_t y, coord_t xscale, coord_t ysc
     update_camera_matrices();
 }
 
+ogm::geometry::AABB<coord_t> Display::get_viewable_aabb()
+{
+    glm::vec4 p[4] = {
+        { 1, 1, 0, 1 },
+        { -1, -1, 0, 1 },
+        { 1, 1, 0, 1 },
+        { -1, 1, 0, 1 }
+    };
+    geometry::Vector<coord_t> vecs[4];
+    for (size_t i = 0; i < 4; ++i)
+    {
+        p[i] = g_imatrices[MATRIX_VIEW] * p[i];
+        vecs[i] = { p[i].x, p[i].y };
+    }
+    
+    // vecs to aabb
+    coord_t xmin = mapped_minimum<coord_t>(std::begin(p), std::end(p),
+        [](glm::vec4& v) -> coord_t
+        {
+            return v.x;
+        }
+    );
+
+    coord_t xmax = mapped_maximum<coord_t>(std::begin(p), std::end(p),
+        [](glm::vec4& v)  -> coord_t
+        {
+            return v.x;
+        }
+    );
+
+    coord_t ymin = mapped_minimum<coord_t>(std::begin(p), std::end(p),
+        [](glm::vec4& v) -> coord_t
+        {
+            return v.y;
+        }
+    );
+
+    coord_t ymax = mapped_maximum<coord_t>(std::begin(p), std::end(p),
+        [](glm::vec4& v)  -> coord_t
+        {
+            return v.y;
+        }
+    );
+    
+    return { xmin, ymin, xmax, ymax };
+}
+
 void Display::update_camera_matrices()
 {
     // calculate combined matrices
@@ -1569,6 +1616,11 @@ size_t Display::get_joystick_axis_count(size_t index)
 real_t Display::get_joystick_axis_value(size_t index, size_t axis_index)
 {
     return 0;
+}
+
+ogm::geometry::AABB<coord_t> Display::get_viewable_aabb()
+{
+    return { 0, 0, 1, 1 };
 }
 }}
 #endif

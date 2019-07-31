@@ -190,7 +190,7 @@ public:
     // iterate over entities which collide with this entity
     // callback is (entity_id_t, entity_t) -> bool, return false to stop.
     template<typename C>
-    inline void iterate_entity(entity_t entity, C callback)
+    inline void iterate_entity(entity_t entity, C callback) const
     {
         auto aabb = entity.m_aabb;
         m_si.foreach_leaf_in_aabb(aabb,
@@ -211,7 +211,7 @@ public:
     // iterate over entities which collide with this position
     // callback is (entity_id_t, entity_t) -> bool, return false to stop.
     template<typename C>
-    inline void iterate_vector(Vector<coord_t> position, C callback)
+    inline void iterate_vector(Vector<coord_t> position, C callback) const
     {
         auto node_coord = m_si.node_coord(position);
         for (entity_id_t id : m_si.get_leaves_at_node(node_coord))
@@ -231,7 +231,7 @@ public:
     // iterate over entities which collide with this line
     // callback is (entity_id_t, entity_t) -> bool, return false to stop.
     template<typename C>
-    inline void iterate_line(Vector<coord_t> start, Vector<coord_t> end, C callback)
+    inline void iterate_line(Vector<coord_t> start, Vector<coord_t> end, C callback) const
     {
         // OPTIMIZE: just check the spatial hash nodes which intersect the line.
         geometry::AABB<coord_t> aabb{ start, end};

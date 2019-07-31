@@ -95,7 +95,7 @@ public:
         }
     }
 
-    inline s32vec_t node_coord(vector_t v)
+    inline s32vec_t node_coord(vector_t v) const
     {
         if (std::is_integral<coord_t>::value)
         {
@@ -112,13 +112,13 @@ public:
         };
     }
 
-    inline const leaf_vector_t& get_leaves_at_node(s32vec_t location)
+    inline const leaf_vector_t& get_leaves_at_node(s32vec_t location) const
     {
         return m_nodes[hash(location)].m_leaf_indices;
     }
 
     template<typename C>
-    inline void foreach_leaf_in_aabb(aabb_t aabb, const C& c)
+    inline void foreach_leaf_in_aabb(aabb_t aabb, const C& c) const
     {
         foreach_node_index_in_aabb(aabb,
             [&c, this](node_index_t n)
@@ -145,14 +145,14 @@ private:
         m_leaves[l].m_containers.push_back(n);
     }
 
-    inline node_index_t hash(s32vec_t v)
+    inline node_index_t hash(s32vec_t v) const
     {
         // unsigned modulo.
         return static_cast<node_index_t>(v.x + m_y_mult * v.y) % k_bucket_count;
     }
 
     template<typename C>
-    inline void foreach_node_index_in_aabb(aabb_t aabb, C c)
+    inline void foreach_node_index_in_aabb(aabb_t aabb, C c) const
     {
         s32vec_t start = node_coord(aabb.m_start);
         s32vec_t end = node_coord(aabb.m_end);

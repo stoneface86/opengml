@@ -91,11 +91,15 @@ public:
 
     // sets camera view
     void set_matrix_view(coord_t x1, coord_t y1, coord_t x2, coord_t y2, real_t angle);
-    void set_fog(bool enabled, real_t begin=0, real_t end=1, uint32_t colour=0xffffff);
+    
+    // return value contains all viewable area (and possibly a bit more).
+    ogm::geometry::AABB<coord_t> get_viewable_aabb();
 
     // sets the transform for what is to be drawn
     void set_matrix_model(coord_t x=0, coord_t y=0, coord_t xscale=1, coord_t yscale=1, real_t angle=0);
 
+    void set_fog(bool enabled, real_t begin=0, real_t end=1, uint32_t colour=0xffffff);
+    
     // sets the colour of the space outside of viewports
     uint32_t get_clear_colour();
     void set_clear_colour(uint32_t);

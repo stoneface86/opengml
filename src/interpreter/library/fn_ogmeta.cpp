@@ -115,26 +115,37 @@ void ogm::interpreter::fn::ogm_ptr_is_null(VO out, V vptr)
 
 namespace
 {
-    inline void render_tile_layer(const TileLayer& layer)
+    inline void render_tile_layer(const TileLayer& layer, const geometry::AABB<coord_t>& aabb)
     {
         Variable dummy;
-
-        // OPTIMIZE: accelerated tile layer rendering
-        for (tile_id_t id: layer.m_contents)
+        
+        const ogm::collision::Entity<coord_t, tile_id_t> collider
         {
-            Tile& tile = frame.m_tiles.get_tile(id);
-            if (tile.m_visible)
+            ogm::collision::Shape::rectangle,
+            aabb,
+            -1
+        };
+        
+        // OPTIMIZE: accelerated tile layer rendering (assume mostly static)
+        layer.m_collision.iterate_entity(collider,
+            [&](tile_id_t id, const ogm::collision::Entity<coord_t, tile_id_t>&) -> bool
             {
-                draw_background_part_ext(
-                    dummy,
-                    tile.m_background_index,
-                    tile.m_bg_position.x, tile.m_bg_position.y,
-                    tile.m_dimension.x, tile.m_dimension.y,
-                    tile.m_position.x, tile.m_position.y,
-                    tile.m_scale.x, tile.m_scale.y,
-                    tile.m_blend, 1);
+                const Tile& tile = frame.m_tiles.get_tile(id);
+                if (tile.m_visible)
+                {
+                    draw_background_part_ext(
+                        dummy,
+                        tile.m_background_index,
+                        tile.m_bg_position.x, tile.m_bg_position.y,
+                        tile.m_dimension.x, tile.m_dimension.y,
+                        tile.m_position.x, tile.m_position.y,
+                        tile.m_scale.x, tile.m_scale.y,
+                        tile.m_blend, 1);
+                }
+                
+                return true;
             }
-        }
+        );
     }
 
     template<StaticEvent event>
@@ -230,7 +241,7 @@ namespace
                     else
                     // render tile layer
                     {
-                        render_tile_layer(*iter_tile);
+                        render_tile_layer(*iter_tile, staticExecutor.m_frame.m_display->get_viewable_aabb());
                         ++iter_tile;
                     }
                 }
